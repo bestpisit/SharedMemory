@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <button id="produceBtn">Produce</button>
+    <button id="consumeBtn">Consume</button>
+    <div id="buffer"></div>
+    <div id="status"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('produceBtn').onclick = function () {
+            socket.emit('produce', 'item');
+        };
+
+        document.getElementById('consumeBtn').onclick = function () {
+            socket.emit('consume');
+        };
+
+        socket.on('buffer', (buffer) => {
+            document.getElementById('buffer').innerHTML = buffer.join(', ');
+        });
+
+        socket.on('deadlock', (msg) => {
+            document.getElementById('status').innerHTML = msg;
+        });
+
+        socket.on('starvation', (msg) => {
+            document.getElementById('status').innerHTML = msg;
+        });
+    </script>
+</body>
+
+</html>

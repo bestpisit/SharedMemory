@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <button id="startReadBtn">Start Read</button>
+    <button id="stopReadBtn">Stop Read</button>
+    <input id="writeInput" type="text" placeholder="Write Data">
+    <button id="startWriteBtn">Start Write</button>
+    <button id="stopWriteBtn">Stop Write</button>
+    <div id="data"></div>
+    <div id="readCount"></div>
+    <div id="status"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('startReadBtn').onclick = function () {
+            socket.emit('startRead');
+        };
+
+        document.getElementById('stopReadBtn').onclick = function () {
+            socket.emit('stopRead');
+        };
+
+        document.getElementById('startWriteBtn').onclick = function () {
+            let writeData = document.getElementById('writeInput').value;
+            socket.emit('startWrite', writeData);
+        };
+
+        document.getElementById('stopWriteBtn').onclick = function () {
+            socket.emit('stopWrite');
+        };
+
+        socket.on('data', (data) => {
+            document.getElementById('data').innerHTML = data;
+        });
+
+        socket.on('readCount', (count) => {
+            document.getElementById('readCount').innerHTML = 'Read Count: ' + count;
+        });
+
+        socket.on('deadlock', (msg) => {
+            document.getElementById('status').innerHTML = msg;
+        });
+    </script>
+</body>
+
+</html>

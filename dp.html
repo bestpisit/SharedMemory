@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dining Philosophers</title>
+    <style>
+        #philosophers {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .philosopher {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="philosophers"></div>
+
+    <script>
+        const socket = io();
+
+        // When the state is updated, redraw the philosophers and forks
+        socket.on('update', ({ philosophers, forks }) => {
+            const container = document.getElementById('philosophers');
+            container.innerHTML = '';
+
+            for (const philosopher of philosophers) {
+                const div = document.createElement('div');
+                div.className = 'philosopher';
+
+                const state = document.createElement('p');
+                state.textContent = `Philosopher ${philosopher.id}: ${philosopher.state}`;
+                div.appendChild(state);
+
+                const leftFork = document.createElement('p');
+                leftFork.textContent = `Left fork: ${philosopher.leftFork.status === 1 ? 'available' : 'taken'}`;
+                div.appendChild(leftFork);
+
+                const rightFork = document.createElement('p');
+                rightFork.textContent = `Right fork: ${philosopher.rightFork.status === 1 ? 'available' : 'taken'}`;
+                div.appendChild(rightFork);
+
+                const startButton = document.createElement('button');
+                startButton.textContent = 'Start eating';
+                startButton.onclick = () => {
+                    socket.emit('startEat', philosopher.id);
+                };
+                div.appendChild(startButton);
+
+                const stopButton = document.createElement('button');
+                stopButton.textContent = 'Stop eating';
+                stopButton.onclick = () => {
+                    socket.emit('stopEat', philosopher.id);
+                };
+                div.appendChild(stopButton);
+
+                container.appendChild(div);
+            }
+        });
+    </script>
+</body>
+</html>
